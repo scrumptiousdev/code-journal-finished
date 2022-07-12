@@ -106,7 +106,7 @@ const beforeUnloadCB = () => localStorage.setItem(_entryLocalStorageKey, JSON.st
 // Main
 const main = () => {
   attachListener('#image-input', 'input', imageInputCB);
-  attachListener('#photourl-input', ['input', 'paste'], photoInputCB);
+  attachListener('#photourl-input', ['input', 'paste', 'change', 'keyup'], photoInputCB);
   attachListener('#create-form', 'submit', createFormCB);
   attachListener(null, 'beforeunload', beforeUnloadCB);
   loadEntries();
