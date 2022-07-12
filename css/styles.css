@@ -7,6 +7,7 @@
   --grey-light: #f0f0f0;
   --grey: grey;
   --white: #fff;
+  --error: red;
 }
 
 /* Global */
@@ -21,6 +22,11 @@ body {
 
 .justify-end {
   justify-content: flex-end;
+}
+
+.input-error {
+  color: var(--error);
+  font-size: 0.75rem;
 }
 
 button {

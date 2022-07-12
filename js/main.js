@@ -66,6 +66,8 @@ const imageInputCB = ({ target: { files } }) => {
 };
 
 const photoInputCB = ({ target: { value } }) => {
+  $('.input-error').textContent = '';
+
   if (_fileUploaded) {
     _fileUploaded = false;
     $('#image-input').value = null;
@@ -78,6 +80,13 @@ const createFormCB = e => {
   e.preventDefault();
 
   const { title, photourl, notes } = e.target.elements;
+
+  $('.input-error').textContent = '';
+
+  if (!_fileUploaded && !imgCheck(photourl.value)) {
+    $('.input-error').textContent = '(Invalid photo URL)';
+    return;
+  }
 
   cjData.entries.unshift({
     entryId: cjData.nextEntryId,
