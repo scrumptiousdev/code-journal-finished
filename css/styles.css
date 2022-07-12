@@ -1,0 +1,94 @@
+/* Font */
+@import url("https://fonts.googleapis.com/css2?family=Proza+Libre@1&display=swap");
+
+/* Variables */
+:root {
+  --primary-color: #562a81;
+  --grey-light: #f0f0f0;
+  --grey: grey;
+  --white: #fff;
+}
+
+/* Global */
+body {
+  background-color: var(--grey-light);
+  font-family: "Open Sans", sans-serif;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+button {
+  color: var(--white);
+  background-color: var(--primary-color);
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: none;
+  text-transform: uppercase;
+  border-radius: 0.25rem;
+}
+
+label {
+  display: block;
+  font-family: "Proza Libre", "Open Sans", sans-serif;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  border-radius: 0.25rem;
+  margin-bottom: 1.75rem;
+  font-size: 1.1rem;
+  padding: 0.5rem 0.25rem;
+  border: none;
+  outline: 1px solid var(--grey);
+}
+
+textarea {
+  resize: none;
+}
+
+input:focus,
+textarea:focus {
+  outline: 2px solid var(--primary-color);
+}
+
+.font-primary {
+  font-family: "Proza Libre", "Open Sans", sans-serif;
+  font-weight: normal;
+}
+
+#page-title {
+  font-size: 2rem;
+}
+
+/* Header */
+#header {
+  background-color: var(--primary-color);
+  font-size: 0.6rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+#header a {
+  text-decoration: none;
+}
+
+#header-logo {
+  margin: 0;
+  color: var(--white);
+}
+
+/* Create */
+#image-upload-input {
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 1.75rem;
+}

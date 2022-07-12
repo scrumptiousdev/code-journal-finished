@@ -31,8 +31,37 @@
     <div class="container">
       <div class="row">
         <div class="column-full">
-          <h2 id="page-title" class="font-primary">Homepage</h2>
+          <h2 id="page-title" class="font-primary">New Entry</h2>
         </div>
+      </div>
+      <div data-view="entry-form">
+        <form>
+          <div class="row">
+            <div class="column-half">
+              <label for="image-input">
+                <img id="image-upload-input" src="images/placeholder-image-square.jpg" alt="Image upload placeholder" />
+              </label>
+              <input id="image-input" class="hidden" type="file" />
+            </div>
+            <div class="column-half">
+              <label for="title-input">Title</label>
+              <input id="title-input" type="text" />
+              <label for="photourl-input">Photo URL</label>
+              <input id="photourl-input" type="text" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="column-full">
+              <label for="notes-input">Notes</label>
+              <textarea id="notes-input" rows="6" ></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="flex column-full justify-end">
+              <button>Save</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </main>
