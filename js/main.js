@@ -80,12 +80,13 @@ const createFormCB = e => {
   const { title, photourl, notes } = e.target.elements;
 
   cjData.entries.unshift({
+    entryId: cjData.nextEntryId,
     title: title.value,
     image: _fileUploaded ? getBase64Image($('#image-upload-input')) : photourl.value,
     notes: notes.value
   });
 
-  cjData.nextEntryId++;
+  cjData.nextEntryId += 1;
 
   $('#image-upload-input').src = _imagePlaceholderSrc;
   e.target.reset();
@@ -96,7 +97,7 @@ const beforeUnloadCB = () => localStorage.setItem(_entryLocalStorageKey, JSON.st
 // Main
 const main = () => {
   attachListener('#image-input', 'input', imageInputCB);
-  attachListener('#photourl-input', ['input', 'change'], photoInputCB);
+  attachListener('#photourl-input', ['input', 'paste'], photoInputCB);
   attachListener('#create-form', 'submit', createFormCB);
   attachListener(null, 'beforeunload', beforeUnloadCB);
   loadEntries();
