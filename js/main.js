@@ -222,6 +222,7 @@ const loadView = () => {
 const editIconClickCB = e => {
   const [parentElem] = e.path.filter(({ className }) => className === 'entry');
   parseInt(parentElem.dataset.entryId);
+  navigateToEntryFormCB();
 };
 
 const attachEditListener = () => {
