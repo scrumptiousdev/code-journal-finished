@@ -85,10 +85,6 @@ textarea:focus {
   padding-bottom: 1rem;
 }
 
-#header a {
-  text-decoration: none;
-}
-
 #header-logo {
   margin: 0;
   color: var(--white);
