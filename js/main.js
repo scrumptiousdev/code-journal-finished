@@ -1,6 +1,7 @@
 // Global
 let cjData = { ...data };
 let _fileUploaded = false;
+const _rememberViewStorageKey = 'cjview';
 const _entryLocalStorageKey = 'codejournal';
 const _imagePlaceholderSrc = 'images/placeholder-image-square.jpg';
 
@@ -170,7 +171,10 @@ const displayEntries = singleEntry => {
   });
 };
 
+const rememberView = view => localStorage.setItem(_rememberViewStorageKey, view);
+
 const navigateToEntryFormCB = () => {
+  rememberView('entry-form');
   $('div[data-view="entries"]').classList.add('hidden');
   $('div[data-view="entry-form"]').classList.remove('hidden');
 };
@@ -178,8 +182,18 @@ const navigateToEntryFormCB = () => {
 const navigateToEntriesCB = e => {
   if (e) e.preventDefault();
 
+  rememberView('entries');
   $('div[data-view="entries"]').classList.remove('hidden');
   $('div[data-view="entry-form"]').classList.add('hidden');
+};
+
+const loadView = () => {
+  const lastView = localStorage.getItem(_rememberViewStorageKey);
+
+  if (lastView) {
+    $('div[data-view]').classList.add('hidden');
+    $(`div[data-view="${lastView}"]`).classList.remove('hidden');
+  }
 };
 
 // Main
@@ -190,6 +204,7 @@ const main = () => {
   attachListener(null, 'beforeunload', beforeUnloadCB);
   attachListener('#entries-button', 'click', navigateToEntriesCB);
   attachListener('#entry-form-button', 'click', navigateToEntryFormCB);
+  loadView();
   loadEntries();
   displayEntries();
 };
