@@ -20,7 +20,10 @@
     <div class="container">
       <div class="row">
         <div class="column-full">
-          <h1 id="header-logo" class="font-primary">Code Journal</h1>
+          <div class="flex items-center">
+            <h1 id="header-logo" class="font-primary">Code Journal</h1>
+            <a id="entries-button" href="#">Entries</a>
+          </div>
         </div>
       </div>
     </div>
@@ -30,12 +33,20 @@
       <div data-view="entries">
         <div class="row">
           <div class="column-full">
-            <h2 class="font-primary page-title">Entries</h2>
+            <div class="flex items-center justify-between">
+              <h2 class="font-primary page-title">Entries</h2>
+              <button id="entry-form-button">New</button>
+            </div>
           </div>
         </div>
         <ul id="entries"></ul>
+        <div id="no-entries" class="row hidden">
+          <div class="column-full text-center">
+            <p>No entries have been recorded.</p>
+          </div>
+        </div>
       </div>
-      <div data-view="entry-form">
+      <div data-view="entry-form" class="hidden">
         <div class="row">
           <div class="column-full">
             <h2 class="font-primary page-title">New Entry</h2>
@@ -64,7 +75,7 @@
           </div>
           <div class="row">
             <div class="flex column-full justify-end">
-              <button>Save</button>
+              <button id="entry-form-save-button">Save</button>
             </div>
           </div>
         </form>

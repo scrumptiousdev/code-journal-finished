@@ -34,6 +34,33 @@ const loadFile = (file, cb = null) => {
   fr.readAsDataURL(file);
 };
 
+const generateElement = ({ el, attribs, content, children }) => {
+  const element = document.createElement(el);
+
+  if (attribs) {
+    for (const attrib in attribs) {
+      const value = attribs[attrib];
+
+      if (attrib === 'class') {
+        isArray(value) ? value.forEach(v => element.classList.add(v)) : element.classList.add(value);
+      } else {
+        element.setAttribute(attrib, value);
+      }
+    }
+  }
+
+  if (content) element.textContent = content;
+
+  if (children && children.length > 0) {
+    children.forEach(c => {
+      const childElem = generateElement(c);
+      element.append(childElem);
+    });
+  }
+
+  return element;
+};
+
 // Functions
 const loadEntries = () => {
   const storedEntries = localStorage.getItem(_entryLocalStorageKey);
@@ -75,47 +102,25 @@ const createFormCB = e => {
     return;
   }
 
-  cjData.entries.unshift({
+  const newEntry = {
     entryId: cjData.nextEntryId,
     title: title.value,
     image: photourl.value,
     notes: notes.value
-  });
+  };
+
+  cjData.entries.unshift(newEntry);
+
+  displayEntries(newEntry);
 
   cjData.nextEntryId += 1;
 
   $('#image-upload-input').src = _imagePlaceholderSrc;
   e.target.reset();
+  navigateToEntriesCB();
 };
 
 const beforeUnloadCB = () => localStorage.setItem(_entryLocalStorageKey, JSON.stringify(cjData));
-
-const generateElement = ({ el, attribs, content, children }) => {
-  const element = document.createElement(el);
-
-  if (attribs) {
-    for (const attrib in attribs) {
-      const value = attribs[attrib];
-
-      if (attrib === 'class') {
-        isArray(value) ? value.forEach(v => element.classList.add(v)) : element.classList.add(value);
-      } else {
-        element.setAttribute(attrib, value);
-      }
-    }
-  }
-
-  if (content) element.textContent = content;
-
-  if (children && children.length > 0) {
-    children.forEach(c => {
-      const childElem = generateElement(c);
-      element.append(childElem);
-    });
-  }
-
-  return element;
-};
 
 const entryGenerator = entryObj => {
   const { title, image, notes } = entryObj;
@@ -147,14 +152,34 @@ const entryGenerator = entryObj => {
   });
 };
 
-const displayEntries = () => {
+const displayEntries = singleEntry => {
   const entries = $('#entries');
+  const entryArr = singleEntry ? [singleEntry] : cjData.entries;
 
-  cjData.entries.forEach(data => {
+  if (entryArr.length) {
+    $('#no-entries').classList.add('hidden');
+  } else {
+    $('#no-entries').classList.remove('hidden');
+
+  }
+
+  entryArr.forEach(data => {
     const entry = entryGenerator(data);
 
-    entries.append(entry);
+    singleEntry ? entries.prepend(entry) : entries.append(entry);
   });
+};
+
+const navigateToEntryFormCB = () => {
+  $('div[data-view="entries"]').classList.add('hidden');
+  $('div[data-view="entry-form"]').classList.remove('hidden');
+};
+
+const navigateToEntriesCB = e => {
+  if (e) e.preventDefault();
+
+  $('div[data-view="entries"]').classList.remove('hidden');
+  $('div[data-view="entry-form"]').classList.add('hidden');
 };
 
 // Main
@@ -163,6 +188,8 @@ const main = () => {
   attachListener('#photourl-input', ['input', 'paste', 'change', 'keyup'], photoInputCB);
   attachListener('#create-form', 'submit', createFormCB);
   attachListener(null, 'beforeunload', beforeUnloadCB);
+  attachListener('#entries-button', 'click', navigateToEntriesCB);
+  attachListener('#entry-form-button', 'click', navigateToEntryFormCB);
   loadEntries();
   displayEntries();
 };
