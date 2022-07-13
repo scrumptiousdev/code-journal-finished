@@ -221,7 +221,11 @@ const loadView = () => {
 
 const editIconClickCB = e => {
   const [parentElem] = e.path.filter(({ className }) => className === 'entry');
-  parseInt(parentElem.dataset.entryId);
+  const editEntryId = parseInt(parentElem.dataset.entryId);
+  const [currentEntry] = cjData.entries.filter(({ entryId }) => entryId === editEntryId);
+
+  cjData.editing = currentEntry;
+
   navigateToEntryFormCB();
 };
 
