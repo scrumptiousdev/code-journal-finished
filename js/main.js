@@ -8,13 +8,17 @@ const _imagePlaceholderSrc = 'images/placeholder-image-square.jpg';
 // Utils
 const $ = selector => document.querySelector(selector);
 
+const $$ = selector => document.querySelectorAll(selector);
+
 const isArray = value => Array.isArray(value);
 
-const attachListener = (selector, type, cb) => {
+const attachListener = (selector, type, cb, target) => {
   if (!selector) {
     window.addEventListener(type, cb);
   } else if (isArray(type)) {
     type.forEach(t => document.querySelector(selector).addEventListener(t, cb));
+  } else if (target) {
+    $$(target).forEach(t => t.querySelector(selector).addEventListener(type, cb));
   } else {
     document.querySelector(selector).addEventListener(type, cb);
   }
@@ -215,6 +219,15 @@ const loadView = () => {
   }
 };
 
+const editIconClickCB = e => {
+  const [parentElem] = e.path.filter(({ className }) => className === 'entry');
+  parseInt(parentElem.dataset.entryId);
+};
+
+const attachEditListener = () => {
+  attachListener('.edit-icon', 'click', editIconClickCB, '.entry');
+};
+
 // Main
 const main = () => {
   attachListener('#image-input', 'input', imageInputCB);
@@ -226,6 +239,7 @@ const main = () => {
   loadView();
   loadEntries();
   displayEntries();
+  if (cjData.entries.length > 0) attachEditListener();
 };
 
 // Initialization
