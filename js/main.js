@@ -124,11 +124,11 @@ const createFormCB = e => {
 const beforeUnloadCB = () => localStorage.setItem(_entryLocalStorageKey, JSON.stringify(cjData));
 
 const entryGenerator = entryObj => {
-  const { title, image, notes } = entryObj;
+  const { title, image, notes, entryId } = entryObj;
 
   return generateElement({
     el: 'li',
-    attribs: { class: 'entry' },
+    attribs: { class: 'entry', 'data-entry-id': entryId },
     children: [
       {
         el: 'div',
