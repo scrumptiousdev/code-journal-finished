@@ -1,7 +1,6 @@
 // Global
 let cjData = { ...data };
 let _fileUploaded = false;
-const _rememberViewStorageKey = 'cjview';
 const _entryLocalStorageKey = 'codejournal';
 const _imagePlaceholderSrc = 'images/placeholder-image-square.jpg';
 
@@ -122,7 +121,7 @@ const createFormCB = e => {
 
   $('#image-upload-input').src = _imagePlaceholderSrc;
   e.target.reset();
-  navigateToEntriesCB();
+  navigateTo(null, 'entires');
 };
 
 const beforeUnloadCB = () => localStorage.setItem(_entryLocalStorageKey, JSON.stringify(cjData));
@@ -194,29 +193,9 @@ const displayEntries = singleEntry => {
   });
 };
 
-const rememberView = view => localStorage.setItem(_rememberViewStorageKey, view);
-
-const navigateToEntryFormCB = () => {
-  rememberView('entry-form');
-  $('div[data-view="entries"]').classList.add('hidden');
-  $('div[data-view="entry-form"]').classList.remove('hidden');
-};
-
-const navigateToEntriesCB = e => {
+const navigateTo = (e, view) => {
   if (e) e.preventDefault();
-
-  rememberView('entries');
-  $('div[data-view="entries"]').classList.remove('hidden');
-  $('div[data-view="entry-form"]').classList.add('hidden');
-};
-
-const loadView = () => {
-  const lastView = localStorage.getItem(_rememberViewStorageKey);
-
-  if (lastView) {
-    $('div[data-view]').classList.add('hidden');
-    $(`div[data-view="${lastView}"]`).classList.remove('hidden');
-  }
+  rememberView(view);
 };
 
 const editIconClickCB = e => {
@@ -226,8 +205,16 @@ const editIconClickCB = e => {
 
   cjData.editing = currentEntry;
 
-  navigateToEntryFormCB();
+  navigateTo(null, 'entry-form');
 };
+
+const rememberView = view => {
+  cjData.view = view;
+  $('div[data-view]').classList.add('hidden');
+  $(`div[data-view="${view}"]`).classList.remove('hidden');
+};
+
+const loadView = () => $(`div[data-view="${cjData.view}"]`).classList.remove('hidden');
 
 const attachEditListener = () => {
   attachListener('.edit-icon', 'click', editIconClickCB, '.entry');
@@ -239,10 +226,10 @@ const main = () => {
   attachListener('#photourl-input', ['input', 'paste', 'change', 'keyup'], photoInputCB);
   attachListener('#create-form', 'submit', createFormCB);
   attachListener(null, 'beforeunload', beforeUnloadCB);
-  attachListener('#entries-button', 'click', navigateToEntriesCB);
-  attachListener('#entry-form-button', 'click', navigateToEntryFormCB);
-  loadView();
+  attachListener('#entries-button', 'click', e => navigateTo(e, 'entries'));
+  attachListener('#entry-form-button', 'click', () => navigateTo(null, 'entry-form'));
   loadEntries();
+  loadView();
   displayEntries();
   if (cjData.entries.length > 0) attachEditListener();
 };
