@@ -94,6 +94,11 @@ const photoInputCB = ({ target: { value } }) => {
   $('#image-upload-input').src = imgCheck(value) ? value : _imagePlaceholderSrc;
 };
 
+const resetForm = () => {
+  $('#image-upload-input').src = _imagePlaceholderSrc;
+  $('#create-form').reset();
+};
+
 const createFormCB = e => {
   e.preventDefault();
 
@@ -119,8 +124,7 @@ const createFormCB = e => {
 
   cjData.nextEntryId += 1;
 
-  $('#image-upload-input').src = _imagePlaceholderSrc;
-  e.target.reset();
+  resetForm();
   navigateTo(null, 'entires');
 };
 
@@ -193,9 +197,27 @@ const displayEntries = singleEntry => {
   });
 };
 
+const formTitleUpdater = view => {
+  if (view === 'entry-form') $('#form-title').textContent = cjData.editing ? 'Edit Entry' : 'New Entry';
+};
+
 const navigateTo = (e, view) => {
   if (e) e.preventDefault();
+  if (cjData.editing && view !== 'entry-form') {
+    cjData.editing = null;
+    resetForm();
+  }
+  formTitleUpdater(view);
   rememberView(view);
+};
+
+const prepopulateForm = () => {
+  const { title, image, notes } = cjData.editing;
+
+  $('#image-upload-input').src = image;
+  $('#title-input').value = title;
+  $('#photourl-input').value = image;
+  $('#notes-input').value = notes;
 };
 
 const editIconClickCB = e => {
@@ -205,6 +227,7 @@ const editIconClickCB = e => {
 
   cjData.editing = currentEntry;
 
+  prepopulateForm();
   navigateTo(null, 'entry-form');
 };
 
@@ -214,11 +237,13 @@ const rememberView = view => {
   $(`div[data-view="${view}"]`).classList.remove('hidden');
 };
 
-const loadView = () => $(`div[data-view="${cjData.view}"]`).classList.remove('hidden');
-
-const attachEditListener = () => {
-  attachListener('.edit-icon', 'click', editIconClickCB, '.entry');
+const loadView = () => {
+  $(`div[data-view="${cjData.view}"]`).classList.remove('hidden');
+  if (cjData.editing && cjData.view === 'entry-form') prepopulateForm();
+  formTitleUpdater(cjData.view);
 };
+
+const attachEditListener = () => attachListener('.edit-icon', 'click', editIconClickCB, '.entry');
 
 // Main
 const main = () => {
