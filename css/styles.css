@@ -16,12 +16,34 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
 .flex {
   display: flex;
 }
 
 .justify-end {
   justify-content: flex-end;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
 }
 
 .input-error {
@@ -38,7 +60,6 @@ button {
   text-transform: uppercase;
   border-radius: 0.25rem;
   cursor: pointer;
-  margin-bottom: 5rem;
 }
 
 label {
@@ -73,7 +94,7 @@ textarea:focus {
   font-weight: normal;
 }
 
-#page-title {
+.page-title {
   font-size: 2rem;
 }
 
@@ -85,18 +106,39 @@ textarea:focus {
   padding-bottom: 1rem;
 }
 
-#header a {
-  text-decoration: none;
-}
-
 #header-logo {
   margin: 0;
   color: var(--white);
 }
 
-/* Create */
+#entries-button {
+  text-decoration: none;
+  padding: 1rem;
+  font-size: 1rem;
+  margin-left: 1rem;
+  color: var(--white);
+}
+
+/* New Entry */
 #image-upload-input {
   cursor: pointer;
-  width: 100%;
   margin-bottom: 1.75rem;
+}
+
+#entry-form-save-button {
+  margin-bottom: 5rem;
+}
+
+/* Entries */
+.entry {
+  margin-bottom: 2rem;
+}
+
+.entry-heading {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.entry-img {
+  margin-bottom: 2rem;
 }
