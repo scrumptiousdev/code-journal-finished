@@ -99,9 +99,10 @@ const resetForm = () => {
   $('#create-form').reset();
 };
 
-const createFormCB = e => {
+const onFormSubmit = e => {
   e.preventDefault();
 
+  const isNewEntry = !cjData.editing;
   const { title, photourl, notes } = e.target.elements;
 
   $('.input-error').textContent = '';
@@ -111,21 +112,32 @@ const createFormCB = e => {
     return;
   }
 
-  const newEntry = {
+  let newEntry = {
     entryId: cjData.nextEntryId,
     title: title.value,
     image: photourl.value,
     notes: notes.value
   };
 
-  cjData.entries.unshift(newEntry);
+  if (isNewEntry) {
+    cjData.entries.unshift(newEntry);
+    displayEntries(newEntry);
+    cjData.nextEntryId += 1;
+  } else {
+    let existingIndex = 0;
+    const existingEntry = cjData.entries.find(({ entryId }, i) => {
+      existingIndex = i;
+      return entryId === cjData.editing.entryId;
+    });
+    const currentEntryId = existingEntry.entryId;
 
-  displayEntries(newEntry);
-
-  cjData.nextEntryId += 1;
+    newEntry = { ...newEntry, entryId: currentEntryId };
+    cjData.entries[existingIndex] = newEntry;
+    $('#entries').replaceChild(entryGenerator(newEntry), $(`li[data-entry-id="${currentEntryId}"]`));
+  }
 
   resetForm();
-  navigateTo(null, 'entires');
+  navigateTo(null, 'entries');
 };
 
 const beforeUnloadCB = () => localStorage.setItem(_entryLocalStorageKey, JSON.stringify(cjData));
@@ -221,11 +233,10 @@ const prepopulateForm = () => {
 };
 
 const editIconClickCB = e => {
-  const [parentElem] = e.path.filter(({ className }) => className === 'entry');
+  const parentElem = e.path.find(({ className }) => className === 'entry');
   const editEntryId = parseInt(parentElem.dataset.entryId);
-  const [currentEntry] = cjData.entries.filter(({ entryId }) => entryId === editEntryId);
 
-  cjData.editing = currentEntry;
+  cjData.editing = cjData.entries.find(({ entryId }) => entryId === editEntryId);
 
   prepopulateForm();
   navigateTo(null, 'entry-form');
@@ -233,7 +244,7 @@ const editIconClickCB = e => {
 
 const rememberView = view => {
   cjData.view = view;
-  $('div[data-view]').classList.add('hidden');
+  $$('div[data-view]').forEach(dataViewElem => dataViewElem.classList.add('hidden'));
   $(`div[data-view="${view}"]`).classList.remove('hidden');
 };
 
@@ -249,7 +260,7 @@ const attachEditListener = () => attachListener('.edit-icon', 'click', editIconC
 const main = () => {
   attachListener('#image-input', 'input', imageInputCB);
   attachListener('#photourl-input', ['input', 'paste', 'change', 'keyup'], photoInputCB);
-  attachListener('#create-form', 'submit', createFormCB);
+  attachListener('#create-form', 'submit', onFormSubmit);
   attachListener(null, 'beforeunload', beforeUnloadCB);
   attachListener('#entries-button', 'click', e => navigateTo(e, 'entries'));
   attachListener('#entry-form-button', 'click', () => navigateTo(null, 'entry-form'));
