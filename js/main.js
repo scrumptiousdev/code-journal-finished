@@ -23,6 +23,23 @@ const attachListener = (selector, type, cb, target) => {
   }
 };
 
+const deattachListener = (selector, type, cb, target) => {
+  if (!selector) {
+    window.removeEventListener(type, cb);
+  } else if (isArray(type)) {
+    type.forEach(t => document.querySelector(selector).removeEventListener(t, cb));
+  } else if (target) {
+    $$(target).forEach(t => t.querySelector(selector).removeEventListener(type, cb));
+  } else {
+    document.querySelector(selector).removeEventListener(type, cb);
+  }
+};
+
+const reattachListener = (selector, type, cb, target) => {
+  deattachListener(selector, type, cb, target);
+  attachListener(selector, type, cb, target);
+};
+
 const imgCheck = src => {
   const img = new Image();
 
@@ -136,6 +153,7 @@ const onFormSubmit = e => {
     $('#entries').replaceChild(entryGenerator(newEntry), $(`li[data-entry-id="${currentEntryId}"]`));
   }
 
+  reattachListener('.edit-icon', 'click', editIconClickCB, '.entry');
   resetForm();
   navigateTo(null, 'entries');
 };
@@ -254,8 +272,6 @@ const loadView = () => {
   formTitleUpdater(cjData.view);
 };
 
-const attachEditListener = () => attachListener('.edit-icon', 'click', editIconClickCB, '.entry');
-
 // Main
 const main = () => {
   attachListener('#image-input', 'input', imageInputCB);
@@ -267,7 +283,7 @@ const main = () => {
   loadEntries();
   loadView();
   displayEntries();
-  if (cjData.entries.length > 0) attachEditListener();
+  if (cjData.entries.length > 0) attachListener('.edit-icon', 'click', editIconClickCB, '.entry');
 };
 
 // Initialization
