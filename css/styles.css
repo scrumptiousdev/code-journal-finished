@@ -16,6 +16,16 @@ body {
   font-family: "Open Sans", sans-serif;
 }
 
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
 .flex {
   display: flex;
 }
@@ -73,7 +83,7 @@ textarea:focus {
   font-weight: normal;
 }
 
-#page-title {
+.page-title {
   font-size: 2rem;
 }
 
@@ -90,9 +100,22 @@ textarea:focus {
   color: var(--white);
 }
 
-/* Create */
+/* New Entry */
 #image-upload-input {
   cursor: pointer;
-  width: 100%;
   margin-bottom: 1.75rem;
+}
+
+/* Entries */
+.entry {
+  margin-bottom: 2rem;
+}
+
+.entry-heading {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.entry-img {
+  margin-bottom: 2rem;
 }
