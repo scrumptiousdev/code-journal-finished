@@ -142,3 +142,8 @@ textarea:focus {
 .entry-img {
   margin-bottom: 2rem;
 }
+
+.edit-icon {
+  font-size: 1.25rem;
+  color: var(--primary-color);
+}

@@ -143,7 +143,26 @@ const entryGenerator = entryObj => {
             el: 'div',
             attribs: { class: 'column-half' },
             children: [
-              { el: 'h3', attribs: { class: ['entry-heading', 'font-primary'] }, content: title },
+              {
+                el: 'div',
+                attribs: { class: ['flex', 'items-center', 'justify-between'] },
+                children: [
+                  { el: 'h3', attribs: { class: ['entry-heading', 'font-primary'] }, content: title },
+                  {
+                    el: 'a',
+                    attribs: { href: '#' },
+                    children: [
+                      {
+                        el: 'span',
+                        attribs: { class: 'edit-icon' },
+                        children: [
+                          { el: 'i', attribs: { class: ['fa-solid', 'fa-pen'] } }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
               { el: 'p', content: notes }
             ]
           }
