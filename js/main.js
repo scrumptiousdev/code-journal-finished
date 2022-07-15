@@ -209,16 +209,19 @@ const entryGenerator = entryObj => {
   });
 };
 
-const displayEntries = singleEntry => {
-  const entries = $('#entries');
-  const entryArr = singleEntry ? [singleEntry] : cjData.entries;
-
+const displayEmptyPage = entryArr => {
   if (entryArr.length) {
     $('#no-entries').classList.add('hidden');
   } else {
     $('#no-entries').classList.remove('hidden');
-
   }
+};
+
+const displayEntries = singleEntry => {
+  const entries = $('#entries');
+  const entryArr = singleEntry ? [singleEntry] : cjData.entries;
+
+  displayEmptyPage(entryArr);
 
   entryArr.forEach(data => {
     const entry = entryGenerator(data);
@@ -231,11 +234,38 @@ const formTitleUpdater = view => {
   if (view === 'entry-form') $('#form-title').textContent = cjData.editing ? 'Edit Entry' : 'New Entry';
 };
 
+const toggleDeleteEntryDialogCB = e => {
+  if (e) e.preventDefault();
+  $('#delete-dialog').classList.toggle('hidden');
+};
+
+const deleteEntry = () => {
+  cjData.entries = cjData.entries.filter(({ entryId }) => cjData.editing.entryId !== entryId);
+  $(`.entry[data-entry-id="${cjData.editing.entryId}"]`).remove();
+  displayEmptyPage(cjData.entries);
+  navigateTo(null, 'entries');
+};
+
+const handleDialogCB = e => {
+  if (!e.target.dataset.type) return;
+  toggleDeleteEntryDialogCB();
+  if (e.target.dataset.type === 'confirm') deleteEntry();
+};
+
 const navigateTo = (e, view) => {
   if (e) e.preventDefault();
   if (cjData.editing && view !== 'entry-form') {
     cjData.editing = null;
     resetForm();
+  }
+  if (view === 'entry-form') {
+    if (cjData.editing) {
+      $('#entry-form-actions').classList.replace('justify-end', 'justify-between');
+      $('#delete-entry-button').classList.remove('hidden');
+    } else {
+      $('#entry-form-actions').classList.replace('justify-between', 'justify-end');
+      $('#delete-entry-button').classList.add('hidden');
+    }
   }
   formTitleUpdater(view);
   rememberView(view);
@@ -248,6 +278,9 @@ const prepopulateForm = () => {
   $('#title-input').value = title;
   $('#photourl-input').value = image;
   $('#notes-input').value = notes;
+  $('#entry-form-actions').classList.replace('justify-end', 'justify-between');
+  $('#delete-entry-button').classList.remove('hidden');
+  attachListener('#delete-entry-button', 'click', toggleDeleteEntryDialogCB);
 };
 
 const editIconClickCB = e => {
@@ -280,6 +313,7 @@ const main = () => {
   attachListener(null, 'beforeunload', beforeUnloadCB);
   attachListener('#entries-button', 'click', e => navigateTo(e, 'entries'));
   attachListener('#entry-form-button', 'click', () => navigateTo(null, 'entry-form'));
+  attachListener('#delete-dialog', 'click', handleDialogCB);
   loadEntries();
   loadView();
   displayEntries();
