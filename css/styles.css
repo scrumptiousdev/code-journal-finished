@@ -5,9 +5,11 @@
 :root {
   --primary-color: #562a81;
   --grey-light: #f0f0f0;
-  --grey: grey;
+  --grey: #b7b6b7;
   --white: #fff;
+  --black: #000;
   --error: red;
+  --warning: red;
 }
 
 /* Global */
@@ -32,6 +34,10 @@ img {
 
 .flex {
   display: flex;
+}
+
+.justify-center {
+  justify-content: center;
 }
 
 .justify-end {
@@ -125,8 +131,13 @@ textarea:focus {
   margin-bottom: 1.75rem;
 }
 
-#entry-form-save-button {
+#create-form {
   margin-bottom: 5rem;
+}
+
+/* Edit Entry */
+#delete-entry-button {
+  color: var(--warning);
 }
 
 /* Entries */
@@ -146,4 +157,40 @@ textarea:focus {
 .edit-icon {
   font-size: 1.25rem;
   color: var(--primary-color);
+}
+
+#delete-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.delete-dialog-box {
+  max-width: 90%;
+  padding: 2.5rem 1rem;
+  background: var(--white);
+  border-radius: 0.75rem;
+}
+
+.delete-dialog-box p {
+  margin: 0 0 2rem;
+}
+
+#dialog-cancel-button {
+  background: var(--grey);
+  color: var(--black);
+  margin-right: 1rem;
+}
+
+#dialog-confirm-button {
+  background: var(--warning);
+}
+
+@media screen and (min-width: 400px) {
+  .delete-dialog-box {
+    padding: 2.5rem;
+  }
 }
