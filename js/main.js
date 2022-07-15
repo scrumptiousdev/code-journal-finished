@@ -1,23 +1,43 @@
 // Global
 let cjData = { ...data };
 let _fileUploaded = false;
-const _rememberViewStorageKey = 'cjview';
 const _entryLocalStorageKey = 'codejournal';
 const _imagePlaceholderSrc = 'images/placeholder-image-square.jpg';
 
 // Utils
 const $ = selector => document.querySelector(selector);
 
+const $$ = selector => document.querySelectorAll(selector);
+
 const isArray = value => Array.isArray(value);
 
-const attachListener = (selector, type, cb) => {
+const attachListener = (selector, type, cb, target) => {
   if (!selector) {
     window.addEventListener(type, cb);
   } else if (isArray(type)) {
     type.forEach(t => document.querySelector(selector).addEventListener(t, cb));
+  } else if (target) {
+    $$(target).forEach(t => t.querySelector(selector).addEventListener(type, cb));
   } else {
     document.querySelector(selector).addEventListener(type, cb);
   }
+};
+
+const deattachListener = (selector, type, cb, target) => {
+  if (!selector) {
+    window.removeEventListener(type, cb);
+  } else if (isArray(type)) {
+    type.forEach(t => document.querySelector(selector).removeEventListener(t, cb));
+  } else if (target) {
+    $$(target).forEach(t => t.querySelector(selector).removeEventListener(type, cb));
+  } else {
+    document.querySelector(selector).removeEventListener(type, cb);
+  }
+};
+
+const reattachListener = (selector, type, cb, target) => {
+  deattachListener(selector, type, cb, target);
+  attachListener(selector, type, cb, target);
 };
 
 const imgCheck = src => {
@@ -91,9 +111,15 @@ const photoInputCB = ({ target: { value } }) => {
   $('#image-upload-input').src = imgCheck(value) ? value : _imagePlaceholderSrc;
 };
 
-const createFormCB = e => {
+const resetForm = () => {
+  $('#image-upload-input').src = _imagePlaceholderSrc;
+  $('#create-form').reset();
+};
+
+const onFormSubmit = e => {
   e.preventDefault();
 
+  const isNewEntry = !cjData.editing;
   const { title, photourl, notes } = e.target.elements;
 
   $('.input-error').textContent = '';
@@ -103,32 +129,43 @@ const createFormCB = e => {
     return;
   }
 
-  const newEntry = {
+  let newEntry = {
     entryId: cjData.nextEntryId,
     title: title.value,
     image: photourl.value,
     notes: notes.value
   };
 
-  cjData.entries.unshift(newEntry);
+  if (isNewEntry) {
+    cjData.entries.unshift(newEntry);
+    displayEntries(newEntry);
+    cjData.nextEntryId += 1;
+  } else {
+    let existingIndex = 0;
+    const existingEntry = cjData.entries.find(({ entryId }, i) => {
+      existingIndex = i;
+      return entryId === cjData.editing.entryId;
+    });
+    const currentEntryId = existingEntry.entryId;
 
-  displayEntries(newEntry);
+    newEntry = { ...newEntry, entryId: currentEntryId };
+    cjData.entries[existingIndex] = newEntry;
+    $('#entries').replaceChild(entryGenerator(newEntry), $(`li[data-entry-id="${currentEntryId}"]`));
+  }
 
-  cjData.nextEntryId += 1;
-
-  $('#image-upload-input').src = _imagePlaceholderSrc;
-  e.target.reset();
-  navigateToEntriesCB();
+  reattachListener('.edit-icon', 'click', editIconClickCB, '.entry');
+  resetForm();
+  navigateTo(null, 'entries');
 };
 
 const beforeUnloadCB = () => localStorage.setItem(_entryLocalStorageKey, JSON.stringify(cjData));
 
 const entryGenerator = entryObj => {
-  const { title, image, notes } = entryObj;
+  const { title, image, notes, entryId } = entryObj;
 
   return generateElement({
     el: 'li',
-    attribs: { class: 'entry' },
+    attribs: { class: 'entry', 'data-entry-id': entryId },
     children: [
       {
         el: 'div',
@@ -143,7 +180,26 @@ const entryGenerator = entryObj => {
             el: 'div',
             attribs: { class: 'column-half' },
             children: [
-              { el: 'h3', attribs: { class: ['entry-heading', 'font-primary'] }, content: title },
+              {
+                el: 'div',
+                attribs: { class: ['flex', 'items-center', 'justify-between'] },
+                children: [
+                  { el: 'h3', attribs: { class: ['entry-heading', 'font-primary'] }, content: title },
+                  {
+                    el: 'a',
+                    attribs: { href: '#' },
+                    children: [
+                      {
+                        el: 'span',
+                        attribs: { class: 'edit-icon' },
+                        children: [
+                          { el: 'i', attribs: { class: ['fa-solid', 'fa-pen'] } }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
               { el: 'p', content: notes }
             ]
           }
@@ -171,42 +227,63 @@ const displayEntries = singleEntry => {
   });
 };
 
-const rememberView = view => localStorage.setItem(_rememberViewStorageKey, view);
-
-const navigateToEntryFormCB = () => {
-  rememberView('entry-form');
-  $('div[data-view="entries"]').classList.add('hidden');
-  $('div[data-view="entry-form"]').classList.remove('hidden');
+const formTitleUpdater = view => {
+  if (view === 'entry-form') $('#form-title').textContent = cjData.editing ? 'Edit Entry' : 'New Entry';
 };
 
-const navigateToEntriesCB = e => {
+const navigateTo = (e, view) => {
   if (e) e.preventDefault();
+  if (cjData.editing && view !== 'entry-form') {
+    cjData.editing = null;
+    resetForm();
+  }
+  formTitleUpdater(view);
+  rememberView(view);
+};
 
-  rememberView('entries');
-  $('div[data-view="entries"]').classList.remove('hidden');
-  $('div[data-view="entry-form"]').classList.add('hidden');
+const prepopulateForm = () => {
+  const { title, image, notes } = cjData.editing;
+
+  $('#image-upload-input').src = image;
+  $('#title-input').value = title;
+  $('#photourl-input').value = image;
+  $('#notes-input').value = notes;
+};
+
+const editIconClickCB = e => {
+  const parentElem = e.path.find(({ className }) => className === 'entry');
+  const editEntryId = parseInt(parentElem.dataset.entryId);
+
+  cjData.editing = cjData.entries.find(({ entryId }) => entryId === editEntryId);
+
+  prepopulateForm();
+  navigateTo(null, 'entry-form');
+};
+
+const rememberView = view => {
+  cjData.view = view;
+  $$('div[data-view]').forEach(dataViewElem => dataViewElem.classList.add('hidden'));
+  $(`div[data-view="${view}"]`).classList.remove('hidden');
 };
 
 const loadView = () => {
-  const lastView = localStorage.getItem(_rememberViewStorageKey);
-
-  if (lastView) {
-    $('div[data-view]').classList.add('hidden');
-    $(`div[data-view="${lastView}"]`).classList.remove('hidden');
-  }
+  $(`div[data-view="${cjData.view}"]`).classList.remove('hidden');
+  if (cjData.editing && cjData.view === 'entry-form') prepopulateForm();
+  formTitleUpdater(cjData.view);
 };
 
 // Main
 const main = () => {
   attachListener('#image-input', 'input', imageInputCB);
   attachListener('#photourl-input', ['input', 'paste', 'change', 'keyup'], photoInputCB);
-  attachListener('#create-form', 'submit', createFormCB);
+  attachListener('#create-form', 'submit', onFormSubmit);
   attachListener(null, 'beforeunload', beforeUnloadCB);
-  attachListener('#entries-button', 'click', navigateToEntriesCB);
-  attachListener('#entry-form-button', 'click', navigateToEntryFormCB);
-  loadView();
+  attachListener('#entries-button', 'click', e => navigateTo(e, 'entries'));
+  attachListener('#entry-form-button', 'click', () => navigateTo(null, 'entry-form'));
   loadEntries();
+  loadView();
   displayEntries();
+  if (cjData.entries.length > 0) attachListener('.edit-icon', 'click', editIconClickCB, '.entry');
 };
 
 // Initialization

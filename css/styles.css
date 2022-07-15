@@ -23,7 +23,7 @@ ul {
 }
 
 img {
-  max-width: 100%;
+  width: 100%;
 }
 
 .text-center {
@@ -141,4 +141,9 @@ textarea:focus {
 
 .entry-img {
   margin-bottom: 2rem;
+}
+
+.edit-icon {
+  font-size: 1.25rem;
+  color: var(--primary-color);
 }
